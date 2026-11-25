@@ -13,7 +13,7 @@ export function normalize(s) {
 }
 
 // Optional words a player may leave off ("Lake", "River", "the", ...).
-const FILLER = /\b(the|lake|lago|lac|river|rio|sea|ocean|gulf|of|bay|city|republic|islands?|federated states|state)\b/g;
+const FILLER = /\b(the|lake|lago|lac|river|rio|sea|ocean|gulf|of|bay|city|republic|islands?|federated states|state|national park|np|metro area|metro|mount|mt|peak)\b/g;
 export const loose = (s) => normalize(s).replace(FILLER, " ").replace(/\s+/g, " ").trim();
 
 // Damerau–Levenshtein (optimal string alignment): swapped letters count as one typo.

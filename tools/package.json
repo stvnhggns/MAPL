@@ -5,12 +5,17 @@
   "description": "Rebuilds MAPL's map data from Natural Earth",
   "scripts": {
     "fetch": "node fetch-natural-earth.mjs",
-    "build": "node build-data.mjs raw"
+    "flags": "mkdir -p raw/state-flags && node flags-ast.mjs node_modules/us-state-flags/src/components/flags raw/state-flags",
+    "build": "node build-data.mjs raw && node build-us.mjs raw raw/state-flags node_modules/flag-icons/flags/4x3"
   },
   "dependencies": {
     "d3-geo": "^3.1.1",
     "mapshaper": "^0.6.100",
     "topojson-server": "^3.0.1",
-    "topojson-simplify": "^3.0.3"
+    "topojson-simplify": "^3.0.3",
+    "topojson-client": "^3.1.0",
+    "acorn": "^8.14.0",
+    "flag-icons": "7.6.0",
+    "us-state-flags": "1.0.7"
   }
 }

@@ -23,13 +23,11 @@
   <!-- Menu -->
   <section id="menu" class="screen">
     <h1>Geography games</h1>
-    <p class="lede">Pick a game and a difficulty.</p>
-    <div class="cards" id="gameCards">
-      <button class="card" data-game="countries"><span class="card-ico">🌍</span><b>Countries</b><span>Name the shaded country on the globe.</span></button>
-      <button class="card" data-game="cities"><span class="card-ico">🏙️</span><b>Cities</b><span>Capitals, largest cities, and "what city is this?"</span></button>
-      <button class="card" data-game="water"><span class="card-ico">🌊</span><b>Waterways</b><span>Oceans, seas, lakes and rivers.</span></button>
-      <button class="card" data-game="atlas"><span class="card-ico">🧭</span><b>Atlas</b><span>Explore the globe and every country's map.</span></button>
-    </div>
+    <p class="lede">Pick a game, a direction and a difficulty.</p>
+    <h2 class="section-title">World</h2>
+    <div class="cards" id="worldCards"></div>
+    <h2 class="section-title">United States</h2>
+    <div class="cards" id="usCards"></div>
 
     <div id="setup" class="setup" hidden>
       <h2 id="setupTitle"></h2>
@@ -37,6 +35,16 @@
         <div class="opt-label">Question</div>
         <div class="seg" id="variantSeg"></div>
       </div>
+      <div class="opt-group">
+        <div class="opt-label">Direction</div>
+        <div class="seg" id="dirSeg">
+          <button data-dir="name" class="on">Name it</button>
+          <button data-dir="find">Find it</button>
+          <button data-dir="mixed">Mixed</button>
+        </div>
+        <p class="mode-help" id="dirHelp"></p>
+      </div>
+      <label class="opt-check" id="terrGroup" hidden><input type="checkbox" id="terrBox"> Include U.S. territories (Puerto Rico, Guam, U.S. Virgin Islands, American Samoa, Northern Mariana Islands)</label>
       <div class="opt-group">
         <div class="opt-label">Difficulty</div>
         <div class="seg" id="modeSeg">
@@ -55,6 +63,7 @@
     <div class="stage" id="stage">
       <canvas id="globe" aria-label="Globe"></canvas>
       <svg id="cmap" aria-label="Country map" hidden></svg>
+      <svg id="usmap" aria-label="United States map" hidden></svg>
       <div class="stage-tools">
         <button id="zoomIn" title="Zoom in">+</button>
         <button id="zoomOut" title="Zoom out">−</button>
@@ -62,8 +71,10 @@
       </div>
     </div>
     <aside class="panel" id="panel">
+      <img class="flag" id="flagImg" alt="Flag" hidden>
       <div class="prompt" id="prompt"></div>
       <div class="worth" id="worth"></div>
+      <div class="hint" id="hint"></div>
       <div class="choices" id="choices"></div>
       <form class="typein" id="typein" hidden autocomplete="off">
         <input id="answer" type="text" placeholder="Type your answer" autocapitalize="words" spellcheck="false">
@@ -94,10 +105,11 @@
   </section>
 </main>
 
-<footer class="foot">Map data: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a> (public domain). Built with <a href="https://d3js.org" target="_blank" rel="noopener">D3</a>.</footer>
+<footer class="foot">Map data: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a> (public domain). Flags: <a href="https://github.com/lipis/flag-icons" target="_blank" rel="noopener">flag-icons</a> (MIT) and us-state-flags (ISC). Built with <a href="https://d3js.org" target="_blank" rel="noopener">D3</a>.</footer>
 
 <script src="vendor/d3.min.js"></script>
 <script src="vendor/topojson-client.min.js"></script>
+<script src="vendor/d3-composite-projections.min.js"></script>
 <script type="module" src="js/app.js"></script>
 </body>
 </html>

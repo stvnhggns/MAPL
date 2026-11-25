@@ -1,31 +1,30 @@
 // Country detail map (SVG): the country with its neighbours, major rivers and lakes, and city dots.
 // Labels can be hidden (during a question), shown for the target only, or shown for all major cities.
-export function createCountryMap(svgEl) {
+// In "find" rounds the dots are clickable and can be styled as candidates / wrong / right.
+export function createCountryMap(svgEl, { onPick } = {}) {
   const svg = d3.select(svgEl);
   let state = null;
   let zoom = null;
   let transform = d3.zoomIdentity;
 
-  function render({ meta, map, world, cities = [], targetId = null, labels = "none", extraPoints = [] }) {
-    state = { meta, map, world, cities, targetId, labels, extraPoints };
+  function render({ meta, map, world, cities = [], targetId = null, labels = "none", extraPoints = [], show = null, styles = null, pickable = false }) {
+    state = { meta, map, world, cities, targetId, labels, extraPoints, show, styles: new Map(styles ? Object.entries(styles).map(([k, v]) => [Number(k), v]) : []), pickable };
     transform = d3.zoomIdentity;
     draw();
   }
 
   function draw() {
     if (!state) return;
-    const { meta, map, world, cities, targetId, labels, extraPoints } = state;
+    const { meta, map, world, cities, targetId, labels, extraPoints, show, styles, pickable } = state;
     const r = svgEl.getBoundingClientRect();
     const W = Math.max(1, r.width), H = Math.max(1, r.height);
     svg.attr("viewBox", `0 0 ${W} ${H}`).selectAll("*").remove();
 
     const projection = d3.geoAzimuthalEqualArea().rotate([-meta.ctr[0], -meta.ctr[1]]).clipAngle(100).precision(0.2);
-    const fitPts = framePoints(meta.fb).concat(extraPoints);
     const pad = Math.min(W, H) * 0.08;
-    projection.fitExtent([[pad, pad], [W - pad, H - pad]], { type: "MultiPoint", coordinates: fitPts });
-    // never zoom in past ~5 km per pixel... except tiny countries which need it
-    const path = d3.geoPath(projection);
+    projection.fitExtent([[pad, pad], [W - pad, H - pad]], { type: "MultiPoint", coordinates: framePoints(meta.fb).concat(extraPoints) });
     projection.clipExtent([[-50, -50], [W + 50, H + 50]]);
+    const path = d3.geoPath(projection);
 
     svg.append("rect").attr("class", "cmap-ocean").attr("width", W).attr("height", H);
     const g = svg.append("g").attr("class", "content");
@@ -38,8 +37,9 @@ export function createCountryMap(svgEl) {
 
     const dots = svg.append("g").attr("class", "dots");
     const lbl = svg.append("g").attr("class", "labels");
-    const placed = cities.map((c) => ({ c, p: projection([c.lon, c.lat]) })).filter((d) => d.p);
-    const target = placed.find((d) => d.c.id === targetId);
+    const visible = show ? cities.filter((c) => show.has(c.id)) : cities;
+    const placed = visible.map((c) => ({ c, p: projection([c.lon, c.lat]) })).filter((d) => d.p);
+    const target = targetId == null ? null : placed.find((d) => d.c.id === targetId);
 
     function layout(t) {
       dots.selectAll("*").remove();
@@ -48,13 +48,22 @@ export function createCountryMap(svgEl) {
       for (const d of placed) {
         if (d === target) continue;
         const [x, y] = pt(d);
-        dots.append("circle").attr("class", "cmap-city" + (d.c.cap ? " cap" : "")).attr("cx", x).attr("cy", y).attr("r", d.c.cap ? 4.2 : 3.2);
-        if (d.c.cap) dots.append("circle").attr("cx", x).attr("cy", y).attr("r", 1.6).attr("fill", "#fff");
+        const st = styles.get(d.c.id);
+        const cls = "cmap-city" + (d.c.cap ? " cap" : "") + (st ? " " + st : "") + (pickable ? " pick" : "");
+        const rr = st ? 6 : d.c.cap ? 4.2 : 3.2;
+        const dot = dots.append("circle").attr("class", cls).attr("cx", x).attr("cy", y).attr("r", rr);
+        if (d.c.cap && !st) dots.append("circle").attr("cx", x).attr("cy", y).attr("r", 1.6).attr("fill", "#fff").attr("pointer-events", "none");
+        if (pickable) {
+          // generous invisible hit area
+          dots.append("circle").attr("class", "hit").attr("cx", x).attr("cy", y).attr("r", 13).attr("data-id", d.c.id)
+            .on("click", (e) => { e.stopPropagation(); onPick && onPick(d.c.id); });
+          void dot;
+        }
       }
       if (target) {
         const [x, y] = pt(target);
         dots.append("circle").attr("class", "cmap-ring").attr("cx", x).attr("cy", y).attr("r", 16);
-        dots.append("circle").attr("class", "cmap-target").attr("cx", x).attr("cy", y).attr("r", 7);
+        dots.append("circle").attr("class", "cmap-target" + (styles.get(target.c.id) === "right" ? " right" : "")).attr("cx", x).attr("cy", y).attr("r", 7);
       }
       // labels with greedy collision avoidance
       const boxes = [];
@@ -68,7 +77,7 @@ export function createCountryMap(svgEl) {
         const isT = d === target;
         const fs = isT ? 15 : 12;
         const w = d.c.n.length * fs * 0.56 + 4, h = fs + 2;
-        const cands = [[x + 8, y + 4], [x - 8 - w, y + 4], [x - w / 2, y - 10], [x - w / 2, y + 18]];
+        const cands = [[x + 9, y + 4], [x - 9 - w, y + 4], [x - w / 2, y - 11], [x - w / 2, y + 19]];
         let spot = null;
         for (const [lx, ly] of cands) {
           const b = [lx, ly - h + 2, lx + w, ly + 2];
@@ -116,5 +125,12 @@ export function createCountryMap(svgEl) {
     zoomBy(f) { if (zoom) svg.transition().duration(250).call(zoom.scaleBy, f); },
     reset() { if (zoom) svg.transition().duration(300).call(zoom.transform, d3.zoomIdentity); },
     setLabels(mode) { if (state) { state.labels = mode; draw(); } },
+    setStyle(id, cls) { if (state) { if (cls) state.styles.set(id, cls); else state.styles.delete(id); draw(); } },
+    reveal({ targetId, labels = "all", showAll = true }) {
+      if (!state) return;
+      state.targetId = targetId; state.labels = labels; state.pickable = false;
+      if (showAll) state.show = null;
+      draw();
+    },
   };
 }

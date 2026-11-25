@@ -57,7 +57,7 @@ a { color: #1d63a8; }
 /* Game layout */
 #game, #atlas { flex-direction: row; }
 .stage { position: relative; flex: 1; min-width: 0; min-height: 0; background: radial-gradient(circle at 50% 45%, #fbfaf7 0, #ebe7dd 100%); overflow: hidden; }
-.stage canvas, .stage svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.stage canvas, .stage > svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
 .stage canvas { cursor: grab; }
 .stage canvas.dragging { cursor: grabbing; }
 .stage-tools { position: absolute; right: 12px; bottom: 12px; display: flex; flex-direction: column; gap: 6px; }
@@ -115,3 +115,54 @@ a { color: #1d63a8; }
   .status { gap: 8px; font-size: 13px; }
   .best { display: none; }
 }
+
+/* ---- menu sections, setup extras ---- */
+.section-title { width: 100%; max-width: 900px; margin: 18px 0 10px; font-size: 15px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.card .blurb { color: var(--muted); font-size: 14px; }
+.opt-check { display: flex; gap: 8px; align-items: flex-start; margin: 0 0 14px; font-size: 14px; color: var(--ink); }
+.hint { font-size: 14px; color: #8a5a00; min-height: 1em; }
+.flag { width: 100%; max-width: 260px; aspect-ratio: 3 / 2; object-fit: contain; border: 1px solid var(--line); border-radius: 6px; background: #fff; align-self: center; }
+.flag.small { max-width: 120px; display: block; margin-bottom: 10px; }
+
+/* ---- country map dots in find rounds ---- */
+.cmap-city.cand { fill: #e7b84f; stroke: #7a5a12; stroke-width: 1.5; }
+.cmap-city.wrong { fill: var(--bad); stroke: #fff; stroke-width: 1.5; }
+.cmap-city.right, .cmap-target.right { fill: var(--good); }
+.hit { fill: transparent; cursor: pointer; }
+
+/* ---- US map ---- */
+.us-ocean { fill: var(--ocean); }
+.us-other { fill: #f3efe5; stroke: #c9c1b0; stroke-width: .6; }
+.us-state { fill: var(--land); stroke: #8f8672; stroke-width: .8; }
+.us-state.pick { cursor: pointer; }
+.us-state.pick:hover { fill: #e2d9c2; }
+.us-state.target { fill: var(--accent); }
+.us-state.cand { fill: #e7b84f; }
+.us-state.cand:hover { fill: #d9a636; }
+.us-state.given { fill: #7a9cc6; }
+.us-state.wrong { fill: var(--bad); }
+.us-state.right { fill: var(--good); }
+.us-state.focus { fill: #fff6dc; stroke-width: 1.4; }
+.us-hit { fill: none; stroke: transparent; stroke-width: 10; pointer-events: stroke; cursor: pointer; }
+.us-sea { fill: #b4d3e6; stroke: none; }
+.us-sea.target, .us-lake.target { fill: var(--accent); }
+.us-sea.cand, .us-lake.cand { fill: #e7b84f; }
+.us-sea.wrong, .us-lake.wrong { fill: var(--bad); }
+.us-sea.right, .us-lake.right { fill: var(--good); }
+.us-lake { fill: #a9cde3; stroke: #6fa3c4; stroke-width: .5; }
+.us-river { fill: none; stroke: #7fb0d3; stroke-width: 1; stroke-linejoin: round; stroke-linecap: round; }
+.us-river.target { stroke: var(--accent); stroke-width: 3.5; }
+.us-river.cand { stroke: #d9a020; stroke-width: 3.5; }
+.us-river.wrong { stroke: var(--bad); stroke-width: 3.5; }
+.us-river.right { stroke: var(--good); stroke-width: 3.5; }
+.us-hit-line { fill: none; stroke: transparent; stroke-width: 12; pointer-events: stroke; cursor: pointer; }
+.us-hit-poly { fill: transparent; stroke: transparent; stroke-width: 8; pointer-events: all; cursor: pointer; }
+.us-ring { fill: none; stroke: var(--accent); stroke-width: 2.5; }
+.us-pt { fill: #39424a; stroke: #fff; stroke-width: 1; }
+.us-pt.park { fill: #3c7d3a; }
+.us-pt.peak { fill: #6b4f2a; stroke: #fff; stroke-width: 1.2; }
+.us-pt.target { fill: var(--accent); stroke: #fff; stroke-width: 2; }
+.us-pt.cand { fill: #e7b84f; stroke: #7a5a12; stroke-width: 1.5; }
+.us-pt.wrong { fill: var(--bad); }
+.us-pt.right { fill: var(--good); stroke: #fff; stroke-width: 2; }
+.us-insets { fill: none; stroke: #9aa9b3; stroke-width: 1; stroke-dasharray: 4 3; pointer-events: none; }

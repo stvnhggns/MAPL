@@ -10,7 +10,7 @@ function getJSON(url) {
   return cache.get(url);
 }
 
-let worldP, countriesP, citiesP, waterP;
+let worldP, countriesP, citiesP, waterP, usP;
 export function world() {
   return (worldP ||= getJSON("data/world.json").then((topo) => {
     const countries = topojson.feature(topo, topo.objects.countries).features;
@@ -45,6 +45,16 @@ export function water() {
     return { list: list.filter((w) => geo.has(w.id)), geo };
   }));
 }
+export function us() {
+  return (usP ||= Promise.all([getJSON("data/us.json"), getJSON("data/us-meta.json")]).then(([topo, meta]) => {
+    const states = new Map(meta.states.map((s) => [s.id, s]));
+    const citiesBySt = new Map();
+    for (const c of meta.cities) { if (!citiesBySt.has(c.st)) citiesBySt.set(c.st, []); citiesBySt.get(c.st).push(c); }
+    for (const arr of citiesBySt.values()) arr.sort((a, b) => b.pop - a.pop);
+    return { topo, meta, states, citiesBySt };
+  }));
+}
+export const flagUrl = (kind, id) => `data/flags/${kind}/${id}.svg`;
 export function countryMap(iso) {
   return getJSON(`data/maps/${iso}.json`).then((topo) => ({
     land: topojson.feature(topo, topo.objects.land),
