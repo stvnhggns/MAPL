@@ -1,0 +1,16 @@
+{
+  "name": "mapl-data-tools",
+  "private": true,
+  "type": "module",
+  "description": "Rebuilds MAPL's map data from Natural Earth",
+  "scripts": {
+    "fetch": "node fetch-natural-earth.mjs",
+    "build": "node build-data.mjs raw"
+  },
+  "dependencies": {
+    "d3-geo": "^3.1.1",
+    "mapshaper": "^0.6.100",
+    "topojson-server": "^3.0.1",
+    "topojson-simplify": "^3.0.3"
+  }
+}
